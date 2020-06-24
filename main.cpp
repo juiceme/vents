@@ -1,7 +1,13 @@
 #include <string>
 #include <iostream>
+#include <fstream>
+#include <sstream>
+#include <vector>
+#include <algorithm>
 
 #include "vent.hpp"
+
+typedef std::vector< Vent::VentOutput > Vents;
 
 void print_result(Vent::VentOutput output)
 {
@@ -15,23 +21,33 @@ void print_result(Vent::VentOutput output)
 
 int main(int argc, char *argv[])
 {
-  Vent *aa;
-  Vent *bb;
-  Vent *cc;
- 
-  try {
-    aa = new Vent("AA0101201", "Vent_100", 50, 100.5);
-    bb = new Vent("AA0101210", "Vent_125", 45, 90.3);
-    cc = new Vent("AA0101202", "Vent_125", 10, 100);
-  } catch (const char *error) {
-    std::cout << "\n" << error << "\n";
-    return 1;
+  Vents all_vents;
+  std::ifstream inFile;
+  inFile.open("vents.txt");
+  std::string line;
+  Vent *vent;
+
+  while (std::getline(inFile, line)) {
+    std::istringstream line_stream(line);
+    std::vector<std::string> v1;
+    std::string temp;
+    while (line_stream >> temp) {
+      v1.push_back(temp);
+    }
+
+    vent = new Vent((std::string)v1.at(0), (std::string)v1.at(1), std::stoi(v1.at(2)), std::stod(v1.at(3))); 
+    all_vents.push_back(vent->getVent());
   }
 
-  print_result(aa->getVent());
-  print_result(bb->getVent());
-  print_result(cc->getVent());
+  std::sort(begin(all_vents), end(all_vents), 
+	    [](Vent::VentOutput const &t1, Vent::VentOutput const &t2) {
+	      return std::get<2>(t1) > std::get<2>(t2); // or use a custom compare function
+	    }
+	    );
+  
+  for (auto i: all_vents)
+    print_result(i);
   std::cout << "\n";
-    
+
   return 0;
 }
