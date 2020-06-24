@@ -37,6 +37,7 @@ int main(int argc, char *argv[])
 
     vent = new Vent((std::string)v1.at(0), (std::string)v1.at(1), std::stoi(v1.at(2)), std::stod(v1.at(3))); 
     all_vents.push_back(vent->getVent());
+    delete(vent);
   }
 
   std::sort(begin(all_vents), end(all_vents), 
